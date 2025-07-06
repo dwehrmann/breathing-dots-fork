@@ -7,6 +7,11 @@ const roundedSquareWave = (t, delta, a, f) => {
   return ((2 * a) / Math.PI) * Math.atan(Math.sin(2 * Math.PI * t * f) / delta)
 }
 
+function heartbeat(t, bpm = 72) {
+  const f = bpm / 60
+  return Math.exp(-1.5 * (t % (1 / f))) * Math.sin(2 * Math.PI * f * t)
+}
+
 function Dots() {
   const ref = useRef()
   const { vec, transform, positions, distances } = useMemo(() => {
@@ -41,10 +46,13 @@ function Dots() {
       const dist = distances[i]
 
       // Distance affects the wave phase
+      // const t = clock.elapsedTime - dist / 25
+
       const t = clock.elapsedTime - dist / 25
+      const wave = heartbeat(t, 60)
 
       // Oscillates between -0.4 and +0.4
-      const wave = roundedSquareWave(t, 0.15 + (0.2 * dist) / 72, 0.4, 1 / 3.8)
+      //const wave = roundedSquareWave(t, 0.15 + (0.2 * dist) / 72, 0.4, 1 / 3.8)
 
       // Scale initial position by our oscillator
       vec.copy(positions[i]).multiplyScalar(wave + 1.3)
@@ -59,7 +67,7 @@ function Dots() {
   })
   return (
     <instancedMesh ref={ref} args={[null, null, 10000]}>
-      <circleBufferGeometry args={[0.15]} />
+      <circleBufferGeometry args={[0.1]} />
       <meshBasicMaterial />
     </instancedMesh>
   )
